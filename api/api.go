@@ -2,9 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/kmcode-18/task_20_10/s3"
-	"github.com/kmcode-18/task_20_10/store"
-	"github.com/kmcode-18/task_20_10/utils"
+	"github.com/kmcode-18/task21_10/s3"
+	"github.com/kmcode-18/task21_10/store"
+	"github.com/kmcode-18/task21_10/utils"
 	"log"
 	"net/http"
 )

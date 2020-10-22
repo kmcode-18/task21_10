@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/kmcode-18/task_20_10/api"
+	"github.com/kmcode-18/task21_10/api"
 	"log"
 	"net/http"
 	"os"
