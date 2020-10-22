@@ -10,16 +10,16 @@ import (
 )
 
 var (
-	imageFormatTable  =[]string{
-	"image/tif",
-	"image/tiff",
-	"image/jpg",
-	"image/jpeg",
-	"image/gif",
-	"image/png",
-	"image/bmp",
-	"image/eps",
-}
+	imageFormatTable = []string{
+		"image/tif",
+		"image/tiff",
+		"image/jpg",
+		"image/jpeg",
+		"image/gif",
+		"image/png",
+		"image/bmp",
+		"image/eps",
+	}
 	sortOrderList = []string{
 		"asc",
 		"desc",
@@ -41,15 +41,15 @@ func AddImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	if !utils.StrInListStatus(handler.Header.Get("Content-Type"),imageFormatTable){
+	if !utils.StrInListStatus(handler.Header.Get("Content-Type"), imageFormatTable) {
 		err := map[string]interface{}{"message": "please upload a image"}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	err=s3.UploadFileToS3(handler.Filename,file)
-	if err !=nil{
+	err = s3.UploadFileToS3(handler.Filename, file)
+	if err != nil {
 		err := map[string]interface{}{"message": err.Error()}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -63,58 +63,58 @@ func AddImage(w http.ResponseWriter, r *http.Request) {
 	return
 }
 func GetImages(w http.ResponseWriter, r *http.Request) {
-	queryParams:=r.URL.Query()
+	queryParams := r.URL.Query()
 	var qParms store.QueryDetails
 	var ok bool
-	imageId:=queryParams.Get("id")
-	if qParms.ImageId,ok=utils.CheckIntValue(imageId);!ok && imageId!=""{
+	imageId := queryParams.Get("id")
+	if qParms.ImageId, ok = utils.CheckIntValue(imageId); !ok && imageId != "" {
 		err := map[string]interface{}{"message": "id should be a integer value"}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	offSet:=queryParams.Get("offset")
-	if qParms.OffSet,ok=utils.CheckIntValue(offSet);!ok && offSet!=""{
+	offSet := queryParams.Get("offset")
+	if qParms.OffSet, ok = utils.CheckIntValue(offSet); !ok && offSet != "" {
 		err := map[string]interface{}{"message": "offset should be a integer value"}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	limit:=queryParams.Get("limit")
-	if qParms.Limit,ok=utils.CheckIntValue(limit);!ok && limit!=""{
+	limit := queryParams.Get("limit")
+	if qParms.Limit, ok = utils.CheckIntValue(limit); !ok && limit != "" {
 		err := map[string]interface{}{"message": "limit should be a integer value"}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	if qParms.Limit,ok=utils.CheckIntValue(limit);!ok && limit!=""{
+	if qParms.Limit, ok = utils.CheckIntValue(limit); !ok && limit != "" {
 		err := map[string]interface{}{"message": "limit should be a integer value"}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	qParms.SortOrder=queryParams.Get("sort_order")
-	if ok=utils.StrInListStatus(qParms.SortOrder,sortOrderList);!ok && qParms.SortOrder!="" {
+	qParms.SortOrder = queryParams.Get("sort_order")
+	if ok = utils.StrInListStatus(qParms.SortOrder, sortOrderList); !ok && qParms.SortOrder != "" {
 		err := map[string]interface{}{"message": "enter a valid sort order"}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	qParms.SortBy=queryParams.Get("sort_by")
-	if ok=utils.StrInListStatus(qParms.SortBy,sortByList);!ok && qParms.SortBy!="" {
+	qParms.SortBy = queryParams.Get("sort_by")
+	if ok = utils.StrInListStatus(qParms.SortBy, sortByList); !ok && qParms.SortBy != "" {
 		err := map[string]interface{}{"message": "enter a valid sort parameter"}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	resp,err:=store.GetImages(qParms)
-	if err !=nil {
+	resp, err := store.GetImages(qParms)
+	if err != nil {
 		err := map[string]interface{}{"message": "error fetching data from db"}
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -127,7 +127,6 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(success)
 	return
 }
-
 
 func Stop() (err error) {
 	err = store.CloseDbConn()

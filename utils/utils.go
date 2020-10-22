@@ -11,10 +11,10 @@ func StrInListStatus(s string, l []string) (r bool) {
 	return false
 }
 
-func CheckIntValue(input string)(int,bool){
+func CheckIntValue(input string) (int, bool) {
 	v, err := strconv.Atoi(input)
-	if err !=nil{
-		return v,false
+	if err != nil {
+		return v, false
 	}
-	return v,true
+	return v, true
 }

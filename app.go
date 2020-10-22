@@ -16,6 +16,7 @@ func main() {
 }
 
 func startApp() {
+
 	r := mux.NewRouter()
 	log.Println("server started at port : 8080")
 	r.HandleFunc("/image", api.AddImage).Methods("POST")

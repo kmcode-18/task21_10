@@ -6,7 +6,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" //postgres database driver
 	"log"
-	"time"
 )
 
 const (
@@ -18,7 +17,8 @@ const (
 )
 
 var db *gorm.DB
-func InitDbConn()  {
+
+func InitDbConn() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -28,11 +28,11 @@ func InitDbConn()  {
 		log.Println("error : ", err.Error())
 		panic(err)
 	}
-	db=dbase
+	db = dbase
 	log.Println("database connection created")
-	if !db.HasTable(&Image{}){
+	if !db.HasTable(&Image{}) {
 		db = db.CreateTable(&Image{})
-		if db.Error!= nil{
+		if db.Error != nil {
 			panic(err)
 		}
 	}
@@ -41,22 +41,20 @@ func InitDbConn()  {
 func init() {
 	InitDbConn()
 }
-type Repository interface {
-	AddImage(imageDetails Image) (err error)
-	GetImages(qParams QueryDetails)([]Image,error)
-}
+
 type Image struct {
-	ImageID     int   `gorm:"primary_key;autoIncrement:true:image_id" json:"image_id"`
-	ImageName	string	`gorm:"size:75;not null" json:"image_name"`
-	CreatedAt time.Time `gorm:"not null" json:"created_at"`
+	ImageID   int    `gorm:"primary_key;autoIncrement:true:image_id" json:"image_id"`
+	ImageName string `gorm:"size:75;not null" json:"image_name"`
+	CreatedAt string `gorm:"not null" json:"created_at"`
 }
 type QueryDetails struct {
-	ImageId int
-	OffSet int
-	Limit int
+	ImageId   int
+	OffSet    int
+	Limit     int
 	SortOrder string
-	SortBy string
+	SortBy    string
 }
+
 func AddImage(imageDetails Image) (err error) {
 	if db == nil {
 		err = errors.New("unable to connect to database")
@@ -64,9 +62,10 @@ func AddImage(imageDetails Image) (err error) {
 		return
 	}
 	var q *gorm.DB
-	q=db
-	q = q.Create(&imageDetails)
-	if q.Error!=nil{
+	q = db
+	q.LogMode(true)
+	err = q.Create(&imageDetails).Error
+	if err != nil {
 		return err
 	}
 	return
@@ -77,25 +76,26 @@ func CloseDbConn() (err error) {
 	return
 }
 
-func GetImages(qParams QueryDetails)([]Image,error){
+func GetImages(qParams QueryDetails) ([]Image, error) {
 	var q *gorm.DB
-	q=db
+	q = db
 	var images []Image
-	if qParams.ImageId>0{
-		q=q.Where("image_id= ?",qParams.ImageId)
+	if qParams.ImageId > 0 {
+		q = q.Where("image_id= ?", qParams.ImageId)
 	}
-	if qParams.Limit>0{
-		q=q.Limit(qParams.Limit)
+	if qParams.Limit > 0 {
+		q = q.Limit(qParams.Limit)
 	}
-	if qParams.OffSet>0{
-		q=q.Offset(qParams.OffSet)
+	if qParams.OffSet > 0 {
+		q = q.Offset(qParams.OffSet)
 	}
-	if qParams.SortBy != "" && qParams.SortOrder !=""{
-		q=q.Order(qParams.SortBy +" " +qParams.SortOrder)
+	if qParams.SortBy != "" && qParams.SortOrder != "" {
+		q = q.Order(qParams.SortBy + " " + qParams.SortOrder)
 	}
-	q=q.Find(&images)
-	if errors.Is(q.Error, gorm.ErrRecordNotFound){
-		return images,errors.New("no record found")
+	q.LogMode(true)
+	q = q.Find(&images)
+	if errors.Is(q.Error, gorm.ErrRecordNotFound) {
+		return images, errors.New("no record found")
 	}
-	return images,nil
+	return images, nil
 }
